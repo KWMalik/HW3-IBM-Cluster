@@ -7,33 +7,47 @@ public class Xanadu {
 			
 			// Activity A 
 			async clocked(c1, c2) { 
-
+			c2.resumeAll();
 			atomic Console.OUT.println("Kubla Khan");
+			c1.resumeAll();
 
-			}
+/*			}
 			
 			// Activity B 
 			async clocked(c2,c3) { 
-
-			atomic Console.OUT.println("Stately pleasure-dome decree :"); 
-			//	c3.resume();
-			//	Console.OUT.print("Down to the "); 
+			c3.resumeAll();
+			c2.resumeAll();
+		//	atomic Console.OUT.println("Stately pleasure-dome decree :");
+			c3.resumeAll();
+		//	Console.OUT.print("Down to the "); 
 			}
+*/
 			
 			// Activity C 
 			async clocked (c3,c4) { 
 			atomic	Console.OUT.print("In Xanadu did ");
-
-			atomic	Console.OUT.println("Through caverns measureless to man");
-			}
+			c3.resumeAll();
 			
+
+
+		//	atomic	Console.OUT.println("Through caverns measureless to man");
+
+
+			}
+/*			
 			// Activity D 
 			async clocked (c1,c4) { 
+			c4.resumeAll();
+			c1.resumeAll();
+		//	atomic	Console.OUT.println("Where Alph, the sacred river, ran");  
 
-			atomic	Console.OUT.println("Where Alph, the sacred river, ran");  
-
-			atomic	Console.OUT.println("sunless sea. "); 
+		//	atomic	Console.OUT.println("sunless sea. "); 
+		
 			}
-		}	
+		}
+
+*/
+
+	
 	}
 }

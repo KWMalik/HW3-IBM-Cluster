@@ -159,9 +159,13 @@ state of the program.
 		}
 	}
 
+I. The program provided is not safe since:
+   1. There are two writes to be running in parallel, and the clocks
+are not synchronized and thus there may be a write-write error.
 
-
-
+II. The program is not determinant since:
+    1. Depending on the scheduler, the first activity may write to b or 
+vice versa, thus the program is not determinant. 
 
 
 (e) Incensed by the meager attention the sports media pays to Division I-AA
@@ -183,6 +187,11 @@ Being an optimist, our business major expects millions of visitors per week. Why
 will the above function give poor performance when a large number of people are
 trying to submit ratings at the same time ? What can you, a COMS 4130 student,
 do to speed up the ratings service?
+
+The program will have slow performance since the atomic statement will cause the
+program to block, halting all other rights. 
+Create a lock and scheduling lock that allows people to access the shared memory 
+locations in sync. 
 
 
 # Problem 3 (35 points) 
