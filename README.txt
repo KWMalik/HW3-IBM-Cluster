@@ -1,8 +1,11 @@
-##
+## Name:Kurry L Tran
 ## Homework 3 
 ## COMS 4130 Principles and Practice of Parallel Programming 
 ## Fall 2011
 ##
+##
+
+
 
 # Problem 1(20 points)  
 
@@ -58,41 +61,85 @@ For (a)-(d), state whether the code provided is (I) safe or unsafe, (II)
 determinate or indeterminate. You must explain your answers to receive credit.
 
 (a)  	
-	val M = 5;
-	val N = 10;
-	val a = new Rail[Int](N,0);
-		
-	finish for ( id in 0..(N-1) ) async { 
-		var b:Int = 0;
-		for (i in 0..(M-1)){  
-			a(id) += i + b++; 
-		}	
-	}
+1	val M = 5;
+2	val N = 10;
+3	val a = new Rail[Int](N,0);
+4		
+5	finish for ( id in 0..(N-1) ) async { 
+6		var b:Int = 0;
+7		for (i in 0..(M-1)){  
+8			a(id) += i + b++; 
+9		}	
+10	}
+
+I. The program provided is safe since:
+    1. The program preserves the natural ordering of the dependency graph and 
+satifies the partial correctness property.
+    2. The program satisfies the mutual exclusion property since in the critical
+section each async accesses separate sections of the array leaving the array in 
+a consistent state for other asyncs.
+    3. The program is absent of deadlock. 
+
+II. The program provided is determinant since:
+    1. The program given any initial state will produce the exact same result
+independent of how each unit of execution is scheduled, since each async task
+is operating on an independent memory location on the shared data structure.
 
 (b) 
-    val M = 5; 
-    val N = 10; 
-    val a = new Rail[Int](4*N,0);
-		
-    var b:Int = 0;
-    finish for ( id in 0..(N-1) ) async { 
-		for (i in 0..(N-1)) { 
-			a(id+i) = b;
-			atomic b += i;  
-		}
-	}
+1    val M = 5; 
+2    val N = 10; 
+3    val a = new Rail[Int](4*N,0);
+4		
+5    var b:Int = 0;
+6    finish for ( id in 0..(N-1) ) async { 
+7		for (i in 0..(N-1)) { 
+8			a(id+i) = b;
+9			atomic b += i;  
+10		}
+11	}
+
+I. The program provided is not safe since:
+    1. A race condition occurs in the critical section at line 8. 
+    2. We cannot guarantee mutual exclusion in the critical section
+since scheduler non-determinism causes parallel threads to interleave
+in arbitrary fashion, thus multiple threads may concurrently try to 
+write to memory location a(id+i).
+    3. The program does not always preserve the ordering of the 
+dependency graph and it does not satisfy the partial correctness
+property.
+
+II. The program provided is not deterministic since:
+    1. Not all executions of the code produce the exact same final state.
+    2. Each state of the program is determined by the value of b, and
+depending on which thread executes the atomic statement first, the value
+of a(id+i) is set and this is non-deterministic due to the scheduler.   
 
 (c)
-	val N = 10; 
-	val a = new Rail[Int](N*N,0); 
-		
-	var b:Int = 0; 
-	finish for ( id in 0..(N-1) ) async { 
-		for (i in 0..(N-1)) async{ 
-			a(id+i*N) = i%N;
-			atomic b += i;  
-		}
-	}
+1	val N = 10; 
+2	val a = new Rail[Int](N*N,0); 
+3		
+4	var b:Int = 0; 
+5	finish for ( id in 0..(N-1) ) async { 
+6		for (i in 0..(N-1)) async{ 
+7			a(id+i*N) = i%N;
+8			atomic b += i;  
+9		}
+10	}
+
+I. The program is not safe since:
+   1. The race condition on line 7 causes the write
+to memory location a(id+i*N) to  be non-deterministic,
+ and mutual exclusion cannot be guaranteed since there
+could be multiples writes to the same location depending
+on the scheduler.
+
+II. The program is not deterministic since:
+    1. The program is not deterministic since the 
+dependencies change due to the execution of the 
+atomic statement on line 8 which affects the final
+state of the program. 
+
+
 
 (d)
 	var b : Int = 0; 
@@ -111,6 +158,10 @@ determinate or indeterminate. You must explain your answers to receive credit.
 			b++; 
 		}
 	}
+
+
+
+
 
 
 (e) Incensed by the meager attention the sports media pays to Division I-AA
