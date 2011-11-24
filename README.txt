@@ -5,56 +5,10 @@
 ##
 ##
 
-
-
-# Problem 1(20 points)  
-
-Let S be a statement of the form <clk>.advance() where <clk> is c1,c2, c3 or c4. 
-
-Add statements S to the following X10 code so that it deterministically prints out the 
-following lines in order: 
-
-In Xanadu did Kubla Khan
-Stately pleasure-dome decree :
-Where Alph, the sacred river, ran
-Through caverns measureless to man
-Down to the sunless sea. 
-
-To receive full credit, your solution should minimize the calls to advance(). 
-
-public class Xanadu {
-	public static def main(Array[String]) {
-		finish async { 
-			val 	c1 = Clock.make(), c2 = Clock.make(), 
-				c3 = Clock.make(), c4 = Clock.make() ; 
-			
-			// Activity A 
-			async clocked(c1, c2) { 
-				Console.OUT.println("Kubla Khan"); 
-			}
-			
-			// Activity B 
-			async clocked(c2,c3) { 
-				Console.OUT.println("Stately pleasure-dome decree :"); 
-				Console.OUT.print("Down to the "); 			
-			}
-			
-			// Activity C 
-			async clocked (c3,c4) { 
-				Console.OUT.print("In Xanadu did ");
-				Console.OUT.println("Through caverns measureless to man"); 
-			}
-			
-			// Activity D 
-			async clocked (c1,c4) { 
-				Console.OUT.println("Where Alph, the sacred river, ran");  
-				Console.OUT.println("sunless sea. ");
-			}
-		}		
-	}
-}  
-
-
+Note: I reused the makefile from the previous assignment.
+Build and Run:
+make xanadu
+make lockfreeset
 
 # Problem 2 (25 points) 
 For (a)-(d), state whether the code provided is (I) safe or unsafe, (II)
@@ -188,6 +142,7 @@ will the above function give poor performance when a large number of people are
 trying to submit ratings at the same time ? What can you, a COMS 4130 student,
 do to speed up the ratings service?
 
+Answer:
 The program will have slow performance since the atomic statement will cause the
 program to block, halting all other writes to the array.
 What you could do is create a hash table that allows concurrent accesses, and have
@@ -196,40 +151,22 @@ and maintain a safe shared data strucutre with concurrent accesses.
 
 
 # Problem 3 (35 points) 
-
-You are to implement a lock-free list-based set.    
-
-Fill in the add(), remove() and contain() methods in LockFreeSet.x10. add() adds
-an item to the set if it is not already present, it also returns true on success
-and false on failure (i.e. when the item is already present).  remove() removes
-a node if present, returns true on success and false on failure. contains()
-returns true if the item is present and false if not present.
-
-You must implement the algorithm given in
-http://www.research.ibm.com/people/m/michael/spaa-2002.pdf .
-
-Here are a few pointers to get you started: 
-
-- The Node data structure used in the paper uses a tag field to prevent
-  occurrence of the ABA problem (
-  http://en.wikipedia.org/wiki/ABA_problem). Because you are running in a
-  garbage collected environment, you don't have to worry about the tag field and
-  your implementation can ignore the details surrounding memory management.
-
-- The nodes in the list are ordered by their keys.
-
-- The data structure should contain two sentinel nodes : head and tail.
-
-- The CAS operation you implement is similar to the one used in the Queue
-  implementation in unit5 lecture notes. But you need a slightly different
-  version as you need to account for the marked field.
-
-In addition to the implementation, you need to answer the following question:
-
 Why can you not just update the next field atomically using compareAndSwap? Why
 did you have to introduce a marked bit/field ? Show an interleaving where just
 using compareAndSwap on next leads to incorrect behavior.
 
+Answer:
+
+You cannot update the next field atomically using compareAndSwap since it 
+would be suseptible to live lock. The purpose of a marked bit/field allows
+marking the next pointer of a deleted node to prevent a concurrent insert 
+operation from linking another node after the deleted node was used.
+Also, marking nodes allows for the reuse of nodes arbitrary reuse of nodes
+in the future. 
+
+If two processes are running in parallel, one process may set the next
+field to one node to null, while the other process is setting the prev
+node to the next node, which would lead to incorrect behavior. 
 
 # Problem 4 ( 20 points ) 
 

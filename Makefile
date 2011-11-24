@@ -9,21 +9,21 @@ X10_NTHREADS := 24
 SEED=40
 
 # SpellCheck Parameters 
-P1=Xanadu
+P1=SpellCheck
 DICT_LOC=/usr/share/dict/words
 NUM_WORDS=10
 P1_ASYNCS=1 2 4
 P1_NUM_TRIALS=1
 
 # MaxInt Parameters 
-P2=ProblemTwo
+P2=Xanadu
 INVEC_SIZE=5000000
 P2_ASYNCS=1 2 8
 P2_NUM_TRIALS=2
 
 
 # MarkFour Parameters 
-P3=ClockEx
+P3=LockFreeSet
 DEPTH=4
 P3_NUM_TRIALS=2
 
@@ -35,7 +35,7 @@ UNIVERSE_WIDTH=500
 P4_ASYNCS=1 2 4
 
 
-xanadu: $(P1).out
+spellcheck: $(P1).out
 $(P1).out: $(P1_ASYNCS:%=$(P1).%.buildandrun) 
 
 $(P1).%.buildandrun: $(P1).exe   
@@ -52,7 +52,7 @@ $(P1).exe: $(P1).x10
 
 
 
-problemtwo: $(P2).out
+xanadu: $(P2).out
 
 $(P2).out: $(P2_ASYNCS:%=$(P2).%.buildandrun)
 
@@ -68,7 +68,7 @@ $(P2).exe: $(P2).x10
 	$(X10_PATH)/x10c++ -t -v -report postcompile=1 -o $(P2).exe -optimize -O -NO_CHECKS $(P2).x10
 
 
-clockex: $(P3).out
+lockfreeset: $(P3).out
 
 $(P3).out: $(P3).exe
 	salloc -n1 srun.x10sock ./$(P3).exe  $(DEPTH) $(SEED) $(P3_NUM_TRIALS) > $(P3).0.out
