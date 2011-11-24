@@ -189,9 +189,10 @@ trying to submit ratings at the same time ? What can you, a COMS 4130 student,
 do to speed up the ratings service?
 
 The program will have slow performance since the atomic statement will cause the
-program to block, halting all other rights. 
-Create a lock and scheduling lock that allows people to access the shared memory 
-locations in sync. 
+program to block, halting all other writes to the array.
+What you could do is create a hash table that allows concurrent accesses, and have
+different locks for different buckets. That way you can safely allow reads/writes 
+and maintain a safe shared data strucutre with concurrent accesses.
 
 
 # Problem 3 (35 points) 
@@ -240,27 +241,39 @@ Suppose n asyncs call the direction() function in the Directions class.
 You will not get points for magically guessing the correct answer. You must
 prove that your answer is correct.
 
-public class Directions {
+Assuming writes to Int and Boolean are atomic. 
 
-	public static LEFT:Int = 0; 
-	public static RIGHT:Int = 1; 
-	public static FORWARD:Int = 2; 
-	
-	var last:Int = -1; 
-	var toTheRight:Boolean = false; 
+a. Answer: n - 1
 
-	public def direction(asyncId:Int) :Int { 
-		last = asyncId;
-		if (toTheRight)  
-			return RIGHT; 
-		toTheRight = true; 
-		if ( last == asyncId ) { 
-			return FORWARD; 
-		} else { 
-			return LEFT; 
-		}
-	}	
-}
+Proof: Suppose n asyncs call the direction() function in the Directions class.
+For the set of asyncs there must exist a first async that calls the direction()
+function. Without loss of generality, suppose async ONE calls the direction() function
+first. Async ONE would enter the body of the function and set last = 1, and read the 
+branch statement and would continue, since toTheRight == false, and then atomically
+write to "toTheRight" and set the value equal to true. 
+     After the atomic write to "toTheRight" n - 1 asyncs are running in parallel
+and calling the direction() function and since toTheRight is equal to true, all
+n - 1 asyncs could have branched at the if statement and returned "RIGHT" and
+exited the body of the function. Thus, while async ONE is executing the body 
+of the function, n - 1 asyncs could get the value RIGHT.
+
+b. Answer: 1
+
+Proof: Suppose the same conditions as stated in (a). Suppose async ONE
+has finished writing to "toTheRight", when async ONE is evaluating the
+branch statement n - 1 asyncs are running in parallel and could have 
+written to the value "last" while async ONE was evaluating the branch
+statement, thus if another async has overwritten "last", async ONE
+would return LEFT, and if another async had not overwritten "last",
+async ONE would return FORWARD. Thus, at most one async could return
+FORWARD or LEFT since, all asyncs after async ONE will return RIGHT
+since all future writes to toTheRight set the value to true, thus
+branch and return at the first if statement. 
+
+c. Answer: 1  
+See part (b) for proof. Since all asyncs after the async ONE 
+evaluate toTheRight == true, they all branch and return RIGHT,
+and only async ONE can possibly return LEFT.
 
 
 
